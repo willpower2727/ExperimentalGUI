@@ -642,19 +642,11 @@ while ~STOP %only runs if stop button is not pressed
         lastL=sentL;
         lastR=sentR;
         memory=0;
-        
-        %Re-setting self-control sign, if necessary
-        if (RstepCount>1 && isnan(velR(RstepCount-1))) || (LstepCount>1 && isnan(velL(LstepCount-1)))
-            signS=0; %Re-setting sign
-        end
-    else %At least one of the belts is in self-controlled mode
-        
-        %If entering self-control mode on this step:
-        if (RstepCount<N-1 && ~isnan(velR(RstepCount-1))) && (LstepCount<N-1 && ~isnan(velL(LstepCount-1))) 
+        if (RstepCount<N-1 && isnan(velR(RstepCount+1))) || (LstepCount<N-1 && isnan(velL(LstepCount+1))) 
             %Next STRIDE will be self-controlled for AT LEAST one of the belts
             if mode==0 && signS==0 %Determine the sign of keypresses if it hasn't been determined yet
                 firstPress=true; %Set to ignore first keypress, it is unset automatically after first keypress by AdaptationGUI.m
-                signS=sign(velR(RstepCount-1)-velL(LstepCount-1));
+                signS=sign(velR(RstepCount)-velL(LstepCount));
                 if signS==0 %Null perturbation case
                     if ~isempty(signList)
                         signS=signList(signCounter);
@@ -675,9 +667,11 @@ while ~STOP %only runs if stop button is not pressed
                 endTonePlayed=false;
             end
         end
-
+        if (RstepCount>1 && isnan(velR(RstepCount-1))) || (LstepCount>1 && isnan(velL(LstepCount-1)))
+            signS=0; %Re-setting sign
+        end
+    else %At least one of the belts is already in self-controlled mode
         
-        %Do the control:
         switch mode
             case 0
                 auxR=lastR+signS*imag(memory); %Unsigned mode
