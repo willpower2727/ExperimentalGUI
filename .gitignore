@@ -45,3 +45,11 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Added by hand
+profiles/
+datlogs/
+otherMfile/
+otherMat/
+calibrations/
+nimbusFiles/
