@@ -140,7 +140,7 @@ def Execute():  #what to do when execute is pressed
 	STDARGS["StatusText"] = StatusText
 	STDARGS["startbut"] = startbut
 	STDARGS["pauseevent"] = pauseevent
-	STDARGS["controller"] = 'C:\Python27\PyAdaptationGUI\Controllers/' + funlist.get()
+	STDARGS["controller"] = 'C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\Controllers/' + funlist.get()
 ##	print(STDARGS["controller"])
 	
 	#define the threads
@@ -171,7 +171,7 @@ def plot():
 	StatusText.insert(Tkinter.END,'Plotting')
 	StatusText.configure(state='disabled')#don't let anyone type in this
 
-	profilename = tkFileDialog.askopenfilename(initialdir='C:\Python27\PyAdaptationGUI\Profiles')
+	profilename = tkFileDialog.askopenfilename(initialdir='C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\profiles')
 	mat = scipy.io.loadmat(profilename)#loads a dictionary
 	
 	global velL #make these available to the rest of the GUI
@@ -289,7 +289,7 @@ drplabel.insert(Tkinter.END,'Control Function')
 drplabel.configure(state='disabled')
 
 clist = list()
-for file in os.listdir('C:\Python27\PyAdaptationGUI\Controllers'):
+for file in os.listdir('C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\Controllers'):
         if file.endswith('.py'):
                 clist.append(file)
 funlist.set("OpenLoop.py")

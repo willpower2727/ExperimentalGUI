@@ -159,103 +159,103 @@ def ControlLoop(STDARGS):
 
 
 
-def OpenLoop_wda(root,q1,speedlist,q3,savestring,q2,velL,velR,nexusvar,stopevent,axe,canvas,stopatendvar,Rspdind,Lspdind):
-##		global sport
-##		global firstframe
-		histzL=0
-		histzR=0
-		rstrides = 0
-		lstrides = 0
-
-		sport = serial.Serial()
-                sport.port = "COM1"
-		
-		if isinstance(velL,( int, long )):#check to make sure user loaded a profile
-			print('No speed profile has been loaded.')
-			stopvar = 1
-		else:
-			#send the first speed command...
-			speedlist = [int(1000*velR[0]),int(1000*velL[0]),1000,1000,0]
-			q3.put(speedlist)
-			print('first speed command sent')
-			
-		maxstridecount = len(velL)
-##		print(maxstridecount)
-
-		#before starting check to see if we need to start Nexus
-		if nexusvar==1:
-			sport.open()
-##			time.sleep(0.1)
-			sport.close()
-			
-		while (not stopevent.is_set()):
-			root = q1.get()
-##			data = ParseRoot(root)
-			data = ParseRoot.ParseRoot(root)
-			
-			Rz = float(data["Rz"])
-			Lz = float(data["Lz"])
-
-##			while PAUSE==1: #what to do if the pause button gets pressed
-##                                time.sleep(0.2)
-##                                print('Paused...')
-##                                speedlist = [0,0,1000,1000,0]
-##				q3.put(speedlist)
-			
-			if (Rz<-30) & (histzR>-30): #RHS
-##				print('rhs')
-				Rspdind.configure(state='normal')
-				Rspdind.delete(1.0,Tkinter.END)
-				Rspdind.insert(Tkinter.END,str(rstrides))
-				Rspdind.configure(state='disabled')#don't let anyone type in this
-				axe.plot(rstrides,velR[rstrides],'r',marker='o',fillstyle='full')
-				canvas.draw()
-
-			elif (Rz>-30) & (histzR<-30): #RTO
-				rstrides +=1
-##				print('rto',rstrides)
-				if (rstrides<maxstridecount):
-					speedlist = [int(1000*velR[rstrides]),int(1000*velL[lstrides]),1000,1000,0]
-					q3.put(speedlist)
-##					print('speed command requested R')
-##					print('q3 size: ',q3.qsize())
-				else:
-					stopevent.set()
-					continue
-				
-			if (Lz<-30) & (histzL>-30): #LHS
-##				print('lhs')
-				Lspdind.configure(state='normal')
-				Lspdind.delete(1.0,Tkinter.END)
-				Lspdind.insert(Tkinter.END,str(lstrides))
-				Lspdind.configure(state='disabled')#don't let anyone type in this
-				axe.plot(lstrides,velL[lstrides],'b',marker='o',fillstyle='full')
-				canvas.draw()
-			elif (Lz>-30) & (histzL<-30): #LTO
-				lstrides +=1
-##				print('lto',lstrides)
-				if (lstrides<maxstridecount):
-					speedlist = [int(1000*velR[rstrides]),int(1000*velL[lstrides]),1000,1000,0]
-					q3.put(speedlist)
-##					print('speed command requested L')
-				else:
-					stopevent.set()
-					continue
-			savestring = [data["FN"],Rz,Lz]
-			q2.put(savestring)
-			
-			histzL = Lz
-			histzR = Rz
-
-		if stopatendvar==1:
-			speedlist = [int(0),int(0),1000,1000,0]
-			q3.put(speedlist)
-##		t1.join()
-		
-		if nexusvar.get()==1:#stop data collection in nexus
-			sport.open()
-##			time.sleep(0.1)
-			sport.close()
-			
-##		cpps.kill()
+##def OpenLoop_wda(root,q1,speedlist,q3,savestring,q2,velL,velR,nexusvar,stopevent,axe,canvas,stopatendvar,Rspdind,Lspdind):
+####		global sport
+####		global firstframe
+##		histzL=0
+##		histzR=0
+##		rstrides = 0
+##		lstrides = 0
+##
+##		sport = serial.Serial()
+##                sport.port = "COM1"
+##		
+##		if isinstance(velL,( int, long )):#check to make sure user loaded a profile
+##			print('No speed profile has been loaded.')
+##			stopvar = 1
+##		else:
+##			#send the first speed command...
+##			speedlist = [int(1000*velR[0]),int(1000*velL[0]),1000,1000,0]
+##			q3.put(speedlist)
+##			print('first speed command sent')
+##			
+##		maxstridecount = len(velL)
+####		print(maxstridecount)
+##
+##		#before starting check to see if we need to start Nexus
+##		if nexusvar==1:
+##			sport.open()
+####			time.sleep(0.1)
+##			sport.close()
+##			
+##		while (not stopevent.is_set()):
+##			root = q1.get()
+####			data = ParseRoot(root)
+##			data = ParseRoot.ParseRoot(root)
+##			
+##			Rz = float(data["Rz"])
+##			Lz = float(data["Lz"])
+##
+####			while PAUSE==1: #what to do if the pause button gets pressed
+####                                time.sleep(0.2)
+####                                print('Paused...')
+####                                speedlist = [0,0,1000,1000,0]
+####				q3.put(speedlist)
+##			
+##			if (Rz<-30) & (histzR>-30): #RHS
+####				print('rhs')
+##				Rspdind.configure(state='normal')
+##				Rspdind.delete(1.0,Tkinter.END)
+##				Rspdind.insert(Tkinter.END,str(rstrides))
+##				Rspdind.configure(state='disabled')#don't let anyone type in this
+##				axe.plot(rstrides,velR[rstrides],'r',marker='o',fillstyle='full')
+##				canvas.draw()
+##
+##			elif (Rz>-30) & (histzR<-30): #RTO
+##				rstrides +=1
+####				print('rto',rstrides)
+##				if (rstrides<maxstridecount):
+##					speedlist = [int(1000*velR[rstrides]),int(1000*velL[lstrides]),1000,1000,0]
+##					q3.put(speedlist)
+####					print('speed command requested R')
+####					print('q3 size: ',q3.qsize())
+##				else:
+##					stopevent.set()
+##					continue
+##				
+##			if (Lz<-30) & (histzL>-30): #LHS
+####				print('lhs')
+##				Lspdind.configure(state='normal')
+##				Lspdind.delete(1.0,Tkinter.END)
+##				Lspdind.insert(Tkinter.END,str(lstrides))
+##				Lspdind.configure(state='disabled')#don't let anyone type in this
+##				axe.plot(lstrides,velL[lstrides],'b',marker='o',fillstyle='full')
+##				canvas.draw()
+##			elif (Lz>-30) & (histzL<-30): #LTO
+##				lstrides +=1
+####				print('lto',lstrides)
+##				if (lstrides<maxstridecount):
+##					speedlist = [int(1000*velR[rstrides]),int(1000*velL[lstrides]),1000,1000,0]
+##					q3.put(speedlist)
+####					print('speed command requested L')
+##				else:
+##					stopevent.set()
+##					continue
+##			savestring = [data["FN"],Rz,Lz]
+##			q2.put(savestring)
+##			
+##			histzL = Lz
+##			histzR = Rz
+##
+##		if stopatendvar==1:
+##			speedlist = [int(0),int(0),1000,1000,0]
+##			q3.put(speedlist)
+####		t1.join()
+##		
+##		if nexusvar.get()==1:#stop data collection in nexus
+##			sport.open()
+####			time.sleep(0.1)
+##			sport.close()
+##			
+####		cpps.kill()
 ##		print('CPP server killed')

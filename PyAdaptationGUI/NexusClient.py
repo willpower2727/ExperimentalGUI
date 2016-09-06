@@ -5,7 +5,7 @@ import sys
 
 def NexusClient(root,q1,stopevent):
 
-		cpps = subprocess.Popen('"C:/Users/Public/Documents/V2PMainPC/Release/PyAdaptVicon2Python.exe"',shell=False)
+		cpps = subprocess.Popen('"C:/Users/BioE/Documents/MATLAB/ExperimentalGUI/PyAdaptationGUI/V2PMainPC/Release/PyAdaptVicon2Python.exe"',shell=False)
 		time.sleep(3)#wait for server to initialize
 
 		HOST = 'localhost'#IP address of CPP server
