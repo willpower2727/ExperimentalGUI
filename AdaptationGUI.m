@@ -325,11 +325,11 @@ switch(selection)
 
     case 2
         mode=1; %Signed
-        allowedKeys={'numpad4','numpad6','leftarrow','rightarrow'}
+        allowedKeys={'numpad4','numpad6','leftarrow','rightarrow','pagedown','pageup'};
         [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, profilename(1:end-4),mode); %
     case 3
         mode=0; %Unsigned 
-        allowedKeys={'numpad8','numpad2','uparrow','downarrow'}
+        allowedKeys={'numpad8','numpad2','uparrow','downarrow'};
         if ~exist('signList','var')
             signList=[];
             %disp('bad')
@@ -701,7 +701,7 @@ set(handles.Status_textbox,'BackgroundColor','Yellow');
 pause(0.25);
 
 [d,n,e]=fileparts(which(mfilename));
-[ff,dd,~] = uigetfile([d '\profiles\'])
+[ff,dd,~] = uigetfile([d '\profiles\']);
 profilename=[dd ff];
 try
     load(profilename);
@@ -853,9 +853,9 @@ if enableMemory && isAllowed && keyWasReleased
                 memory=memory+1i*e;
             case {'downarrow','numpad2'} 
                 memory=memory-1i*e;
-            case {'leftarrow','numpad4'} 
+            case {'leftarrow','numpad4','pageup'} 
                 memory=memory-e;
-            case {'rightarrow','numpad6'}
+            case {'rightarrow','numpad6','pagedown'}
                 memory=memory+e;    
         end
     else %firstpress=true

@@ -26,7 +26,7 @@ c = regexp(temp,' ');
 temp(c) = '_';
 [d,n,e]=fileparts(which(mfilename));
 savename = [[d '\..\datlogs\'] temp '_' profilename];
-set(ghandle.sessionnametxt,'String',savename);
+set(ghandle.sessionnametxt,'String',[temp '_' n]);
 datlog.session_name = savename;
 datlog.errormsgs = {};
 datlog.messages = {};

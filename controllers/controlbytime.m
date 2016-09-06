@@ -47,7 +47,8 @@ b = regexp(temp,':');
 temp(b) = '_';
 c = regexp(temp,' ');
 temp(c) = '_';
-savename = [temp '_controlbytime_' profilename];
+[~,filename,~] = fileparts(profilename);
+savename = [temp '_controlbytime_' filename];
 set(ghandle.sessionnametxt,'String',savename);
 datlog.session_name = savename;
 datlog.errormsgs = {};
@@ -67,9 +68,11 @@ datlog.targets.Ldata = zeros(length(velL)+20,4);
 
 %do initial save
 try
-    save(savename,'datlog');
+    disp(['C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\datlogs\',savename])
+    save(['C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\datlogs\',savename],'datlog');
 catch ME
     disp(ME);
+    disp(ME.stack);
 end
 %Default threshold
 if nargin<3
@@ -294,14 +297,14 @@ while ~STOP %only runs if stop button is not pressed
             sendTreadmillPacket(payload,t);
         end
         
-    elseif etime(clock,starttime) >= 360 && etime(clock,starttime) <= 540
-        elaptime = etime(clock,starttime);
-        if lflag || rflag
-            payload = getPayload(velL(end),velL(end),1000,1000,cur_incl);
-            sendTreadmillPacket(payload,t);
-        end
+%     elseif etime(clock,starttime) >= 360 && etime(clock,starttime) <= 540
+%         elaptime = etime(clock,starttime);
+%         if lflag || rflag
+%             payload = getPayload(velL(end),velL(end),1000,1000,cur_incl);
+%             sendTreadmillPacket(payload,t);
+%         end
        
-    elseif etime(clock,starttime) > 540
+    elseif etime(clock,starttime) > 360
         STOP = 1;
     end
 
@@ -408,16 +411,18 @@ title('Left Step Length')
 xlabel('Time (s)')
 ylabel('SL')
 
-temp = (datlog.targets.Rdata(:,4)-datlog.targets.Ldata(:,4))./(datlog.targets.Rdata(:,4)+datlog.targets.Ldata(:,4));
-temp(isnan(temp))=[];
+m = min([length(datlog.targets.Rdata),length(datlog.targets.Ldata)]);
+
+temp = (datlog.targets.Rdata(1:m,4)-datlog.targets.Ldata(1:m,4))./(datlog.targets.Rdata(1:m,4)+datlog.targets.Ldata(1:m,4));
+% temp(isnan(temp))=[];
 subplot(3,2,6)
-plot(datlog.beltspeeds.data(x1,3),temp)
+plot(datlog.beltspeeds.data(m,3),temp)
 title('Step Length Asymmetry')
 xlabel('Velocity (mm/s)')
 ylabel('SA')
 ylim([-1 1])
 subplot(3,2,5)
-plot(datlog.targets.Rdata(:,3),temp)
+plot(datlog.targets.Rdata(1:m,3),temp)
 title('Step Length Asymmetry')
 xlabel('Time (s)')
 ylabel('SA')

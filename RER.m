@@ -4,16 +4,16 @@ function [] = RER(OGspeed)
 %   
 %   function will generate a 6 minute profile, and save
 
-velL = 0.6666*OGspeed*ones(180,1);
+velL = 0.25*OGspeed*ones(180,1);
 x = 1:180;
-y = 0.6666*OGspeed+(OGspeed-0.6666*OGspeed)/180*x;
+y = 0.25*OGspeed+(OGspeed-0.25*OGspeed)/180*x;
 
 velL = [velL;y'];
 velR = velL;
 
-velL = [velL;OGspeed*ones(180,1)];
-velR = velL;
+% velL = [velL;OGspeed*ones(180,1)];
+% velR = velL;
 
-save('RER.mat','velL','velR');
+save('C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\profiles\RER.mat','velL','velR');
 end
 

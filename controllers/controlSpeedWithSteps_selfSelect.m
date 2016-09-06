@@ -44,10 +44,11 @@ toneplayed=false;
 if nargin<7 || isempty(paramComputeFunc)
    paramComputeFunc=@(w,x,y,z) (-w(2) + .5*(y(2)+z(2)))/1000; %Default
 end
+[d,~,~]=fileparts(which(mfilename));
 if nargin<8 || isempty(paramCalibFunc)
-   load('lastCalibration.mat') 
+   load([d '\..\calibrations\lastCalibration.mat']) 
 else
-    save('./calibrations/lastCalibration.mat','paramCalibFunc','paramComputeFunc')
+    save([d '\..\calibrations\lastCalibration.mat'],'paramCalibFunc','paramComputeFunc')
 end
 
 
@@ -92,7 +93,7 @@ iL=find(aux1==1);
 iL2=find(aux1==-1);
 counter=1;
 for i=1:length(iL)
-    pp=patch([iL(i) iL2(i) iL2(i) iL(i)],[yl(1) yl(1) yl(2) yl(2)],[0 0 1],'FaceAlpha',.2,'EdgeColor','none');
+    pp=patch([iL(i) iL2(i) iL2(i) iL(i)],[yl(1) yl(1) yl(2) yl(2)],[0 .3 .6],'FaceAlpha',.2,'EdgeColor','none');
     uistack(pp,'bottom')
     if (velL(iL(i))-velR(iL(i)))==0
         try
@@ -115,7 +116,7 @@ iL=find(aux1==1);
 iL2=find(aux1==-1);
 counter=1;
 for i=1:length(iL)
-    pp=patch([iL(i) iL2(i) iL2(i) iL(i)],[yl(1) yl(1) yl(2) yl(2)],[1 0 0],'FaceAlpha',.2,'EdgeColor','none');
+    pp=patch([iL(i) iL2(i) iL2(i) iL(i)],[yl(1) yl(1) yl(2) yl(2)],[.6 .3 0],'FaceAlpha',.2,'EdgeColor','none');
     uistack(pp,'bottom')
     if (velL(iL(i))-velR(iL(i)))==0
         try
@@ -137,16 +138,17 @@ end
 %initialize a data structure that saves information about the trial
 datlog = struct();
 datlog.buildtime = now;%timestamp
-temp = datestr(datlog.buildtime);
+temp = datestr(datlog.buildtime,30); %Using ISO 8601 for date/time string format
 a = regexp(temp,'-');
 temp(a) = '_';
 b = regexp(temp,':');
 temp(b) = '_';
 c = regexp(temp,' ');
 temp(c) = '_';
-[d,n,e]=fileparts(which(mfilename));
-savename = [[d '\..\datlogs\'] temp '_' profilename];
-set(ghandle.sessionnametxt,'String',savename);
+[d,~,~]=fileparts(which(mfilename));
+[~,n,~]=fileparts(profilename);
+savename = [[d '\..\datlogs\'] temp '_' n];
+set(ghandle.sessionnametxt,'String',[temp '_' n]);
 datlog.session_name = savename;
 datlog.errormsgs = {};
 datlog.messages = {};
