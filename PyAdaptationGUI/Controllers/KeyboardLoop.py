@@ -1,5 +1,9 @@
 def ControlLoop(CARGS):
 ##    print(CARGS)
+
+    if (CARGS["q5"].empty()==False):
+        print 'Keypress: ',CARGS["q5"].get()
+    
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]
     #determine if speeds need to be sent

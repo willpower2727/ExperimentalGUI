@@ -29,6 +29,7 @@ def ControlLoop(STDARGS):
     maxstridecount = len(STDARGS["velL"])
     CARGS = {}#create dictionary of arguments to be passed to the controller
     CARGS["q3"] = STDARGS["q3"]
+    CARGS["q5"] = STDARGS["q5"]
     CARGS["speedlist"] = STDARGS["speedlist"]
     CARGS["maxstridecount"] = maxstridecount
     CARGS["stopevent"] = STDARGS["stopevent"]

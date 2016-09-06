@@ -9,7 +9,6 @@
 import sys
 import matplotlib
 matplotlib.use('TkAgg')
-#import matplotlib.pyplot as PLT
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 import scipy.io
@@ -17,26 +16,19 @@ import tkFileDialog
 import numpy
 import mtTkinter as Tkinter #special threadsafe version of Tkinter module, required for message windows. You can use regular Tkinter if needed but remove message window code that asks if Nexus is recording
 import time
-##import socket
-##import io
-##import re
 import threading
 import Queue
-##import csv
-##import itertools
 import struct
 import array
 import math
 import os
 import ntpath
-##import subprocess
-##import matplotlib.animation as animation
-##from matplotlib import style
 import ParseRoot
 import StrideCounter
 import NexusClient
 import SaveThread
 import BertecComm
+import KeyHook
 
 #initialize some things
 rot = Tkinter.Tk()
@@ -113,6 +105,7 @@ def Execute():  #what to do when execute is pressed
 	q2 = Queue.Queue()#Queue for saving controller loop data
 	q3 = Queue.Queue()#Queue for treadmill commands
 	q4 = Queue.Queue()#Queue for saving treadmill commands+reads
+	q5 = Queue.Queue()#queue for key logging
 
 	#ask the treadmill for the current incline angle, this will be written on every command during the trial so as not to change it (that would be really bad if the treadmill was locked)
 	inca = BertecComm.askforangle()#asks the treadmill 1 time what the current incline angle is
@@ -127,6 +120,7 @@ def Execute():  #what to do when execute is pressed
 	STDARGS["q3"] = q3
 	STDARGS["savestring"] = savestring
 	STDARGS["q2"] = q2
+	STDARGS["q5"] = q5
 	STDARGS["velL"] = velL
 	STDARGS["velR"] = velR
 	STDARGS["inclineang"] = inca #this will/should change in the future
@@ -148,16 +142,19 @@ def Execute():  #what to do when execute is pressed
 	t2 = threading.Thread(target=StrideCounter.ControlLoop,args=(STDARGS,))#the brain thread, counts strides and updates belt speeds
 	t3 = threading.Thread(target=SaveThread.save,args=(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inca))#takes care of saving data to file
 	t4 = threading.Thread(target=BertecComm.sendreceive,args=(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inca))#communicates with the treadmill
+	t5 = threading.Thread(target=KeyHook.starthook,args=(q5,stopevent))
 		
 	t1.daemon = True
 	t2.daemon = True
 	t3.daemon = True
 	t4.daemon = False
+	t5.daemon = True
 	#start the threads
 	t1.start()
 	t2.start()
 	t3.start()
 	t4.start()
+	t5.start()
 
 def plot():
 	global f
