@@ -1,0 +1,7 @@
+#test script
+
+import matplotlib
+matplotlib.use('TkAgg')
+##import matplotlib.pyplot as PLT
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
