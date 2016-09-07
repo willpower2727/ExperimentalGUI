@@ -1,8 +1,9 @@
 def ControlLoop(CARGS):
 ##    print(CARGS)
+##    print 'size of q5: ',CARGS["q5"].qsize()
 
     if (CARGS["q5"].empty()==False):
-        print 'Keypress: ',CARGS["q5"].get()
+        print 'Keypress in controller: ',CARGS["q5"].get()
     
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]

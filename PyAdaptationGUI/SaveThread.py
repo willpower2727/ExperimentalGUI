@@ -11,7 +11,7 @@ def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang):
 		mststring = str(mst2)+'_'+ntpath.basename(profilename)[:-4]+'_PyGUI.txt'
 		print("Data File created named: ")
 		print(mststring)
-		path = 'C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\DataFiles'
+		path = "C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\DataFiles\\"
 ##		print(path+mststring)
 		filename = path+mststring
 		fileout = open(filename,'w+')

@@ -134,7 +134,7 @@ def Execute():  #what to do when execute is pressed
 	STDARGS["StatusText"] = StatusText
 	STDARGS["startbut"] = startbut
 	STDARGS["pauseevent"] = pauseevent
-	STDARGS["controller"] = 'C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\Controllers/' + funlist.get()
+	STDARGS["controller"] = 'C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\Controllers\\' + funlist.get()
 ##	print(STDARGS["controller"])
 	
 	#define the threads
@@ -142,7 +142,7 @@ def Execute():  #what to do when execute is pressed
 	t2 = threading.Thread(target=StrideCounter.ControlLoop,args=(STDARGS,))#the brain thread, counts strides and updates belt speeds
 	t3 = threading.Thread(target=SaveThread.save,args=(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inca))#takes care of saving data to file
 	t4 = threading.Thread(target=BertecComm.sendreceive,args=(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inca))#communicates with the treadmill
-	t5 = threading.Thread(target=KeyHook.starthook,args=(q5,stopevent))
+	t5 = threading.Thread(target=KeyHook.Hook,args=(q5,stopevent))
 		
 	t1.daemon = True
 	t2.daemon = True
