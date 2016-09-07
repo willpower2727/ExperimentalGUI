@@ -3,12 +3,12 @@ import time
 import numpy
 import ntpath
 
-def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang):
+def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang,controllername):
 
 		mst = time.time()
 		mst2 = int(round(mst))
 
-		mststring = str(mst2)+'_'+ntpath.basename(profilename)[:-4]+'_PyGUI.txt'
+		mststring = str(mst2)+'_'+ntpath.basename(profilename)[:-4]+'_'+controllername+'_PyGUI.txt'
 		print("Data File created named: ")
 		print(mststring)
 		path = "C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\DataFiles\\"
@@ -24,7 +24,7 @@ def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang):
 		csvw.writerow(velRw)
 		csvw.writerow(['Incline Angle'])
 		csvw.writerow([inclineang])
-		csvw.writerow(['FrameNumber','Rfz','Lfz','RHS','LHS','RTO','LTO','Pause','RBSsent','LBSsent','RBSread','LBSread','incang_read'])#write the header
+		csvw.writerow(['FrameNumber','Rfz','Lfz','RHS','LHS','RTO','LTO','Pause','Ascii Key Pressed','RBSsent','LBSsent','RBSread','LBSread','incang_read'])#write the header
 		fileout.close()
 		
 		fileout = open(filename,'a')

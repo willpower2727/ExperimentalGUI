@@ -1,5 +1,4 @@
 def ControlLoop(CARGS):
-##    print(CARGS)
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]
     #determine if speeds need to be sent
@@ -17,7 +16,7 @@ def ControlLoop(CARGS):
         prevvelR = CARGS["velR"][CARGS["rstrides"]]
         prevvelL = CARGS["velL"][CARGS["lstrides"]]
 
-    return [prevvelL,prevvelR]
+    return [prevvelL,prevvelR,0]
 
     
 

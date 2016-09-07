@@ -30,10 +30,12 @@ import SaveThread
 import BertecComm
 import KeyHook
 
+numpy.set_printoptions(threshold=numpy.inf)
+
 #initialize some things
 rot = Tkinter.Tk()
 rot.wm_title("PyAdaptationGUI")
-rot.geometry('{}x{}'.format(900,700))
+rot.geometry('{}x{}'.format(1100,700))
 
 global stopevent #how to signal stopping from GUI
 stopevent = threading.Event()
@@ -71,7 +73,7 @@ def startup(): #what to do when the gui is created
 	
 ##	canvas = FigureCanvasTkAgg(f, master=rot)
 	canvas.show()
-	canvas.get_tk_widget().place(x=0,y=50,width=675,height=575)
+	canvas.get_tk_widget().place(x=0,y=50,width=875,height=575)
 
 def ClosebyX(): #what to do when closing the gui
 ##	print('Window closed')
@@ -140,7 +142,7 @@ def Execute():  #what to do when execute is pressed
 	#define the threads
 	t1 = threading.Thread(target=NexusClient.NexusClient,args=(root,q1,stopevent))#communicates with Nexus
 	t2 = threading.Thread(target=StrideCounter.ControlLoop,args=(STDARGS,))#the brain thread, counts strides and updates belt speeds
-	t3 = threading.Thread(target=SaveThread.save,args=(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inca))#takes care of saving data to file
+	t3 = threading.Thread(target=SaveThread.save,args=(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inca,funlist.get()[:-3]))#takes care of saving data to file
 	t4 = threading.Thread(target=BertecComm.sendreceive,args=(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inca))#communicates with the treadmill
 	t5 = threading.Thread(target=KeyHook.Hook,args=(q5,stopevent))
 		
@@ -175,6 +177,8 @@ def plot():
 	global velR
 	velL = mat["velL"]#look for the profiles in the loaded dictionary
 	velR = mat["velR"]
+##	velR = numpy.where(velR==numpy.nan,velR,numpy.nan)
+##	print 'velR',type(velR[22])
 	size = velR.shape
 	if (size[1] > size[0]):#detect if row or column vector
 		velR = velR.T
@@ -187,10 +191,10 @@ def plot():
 	axe.set_title('Velocity Profile')
 	axe.set_xlabel('stride')
 	axe.set_ylabel('Velocity (m/s)')
-	axe.set_ylim((0,numpy.max([velR,velL])+0.2))
+	axe.set_ylim((0,numpy.nanmax([velR,velL])+0.2))
 
 	canvas.draw()
-	canvas.get_tk_widget().place(x=0,y=50,width=675,height=575)
+	canvas.get_tk_widget().place(x=0,y=50,width=875,height=575)
 	
 	startbut.configure(state='normal')
 	StatusText.configure(state='normal')
@@ -219,7 +223,7 @@ def pause():
                 pausebut.configure(text='PAUSE')
 
 #########################################################################################################################################################################################################
-#Make buttons and text displays
+#Make buttons and text displays and place them
 fakebut = Tkinter.Button(rot,command=startup())#fake button that is not visible or placed, but runs the startup script
 
 Title = Tkinter.Text(rot,background="#C8C8C8",font=("Helvetica",30))
@@ -231,7 +235,7 @@ startbut.place(x=0,y=650,width=100,height=50)
 startbut.configure(state='disabled');
 
 exitbut = Tkinter.Button(rot,text='EXIT',command = ClosebyX,bg='red',font=("Helvetica",15))
-exitbut.place(x=800,y=650,width=100,height=50)
+exitbut.place(x=1000,y=650,width=100,height=50)
 
 stopbut = Tkinter.Button(rot,text='STOP',command = stop,bg='red',font=("Helvetica",15))
 stopbut.place(x=125,y=650,width=100,height=50)
@@ -245,35 +249,35 @@ plotbutton = Tkinter.Button(rot,text='PLOT',command = plot,bg='#A7ECE3',font=("H
 plotbutton.place(x=375,y=650,width=100,height=50)
 
 Rspdlabel = Tkinter.Text(rot,background='#C8C8C8')
-Rspdlabel.place(x=830,y=65,width=70,height=25)
+Rspdlabel.place(x=1030,y=65,width=70,height=25)
 Rspdlabel.insert(Tkinter.END,'Right')
 Rspdlabel.configure(state='disabled')
 Lspdlabel = Tkinter.Text(rot,background='#C8C8C8')
-Lspdlabel.place(x=740,y=65,width=70,height=25)
+Lspdlabel.place(x=940,y=65,width=70,height=25)
 Lspdlabel.insert(Tkinter.END,'Left')
 Lspdlabel.configure(state='disabled')
 
 Rspdind = Tkinter.Text(rot,background='#FF3C3C',font=("Helvetica",20))
-Rspdind.place(x=830,y=100,width=70,height=35)
+Rspdind.place(x=1030,y=100,width=70,height=35)
 Rspdind.insert(Tkinter.END,'000')
 Rspdind.configure(state='disabled')#don't let anyone type in this
 
 Lspdind = Tkinter.Text(rot,background='#4FBDE5',font=("Helvetica",20))
-Lspdind.place(x=740,y=100,width=70,height=35)
+Lspdind.place(x=940,y=100,width=70,height=35)
 Lspdind.insert(Tkinter.END,'000')
 Lspdind.configure(state='disabled')
 
 StatusText = Tkinter.Text(rot,background='#6E67FF',font=("Helvetica",25))
-StatusText.place(x=680,y=150,width=220,height=40)
+StatusText.place(x=880,y=150,width=220,height=40)
 StatusText.insert(Tkinter.END,'Idle')
 StatusText.configure(state='disabled')
 
 StartNexus = Tkinter.Checkbutton(rot,text="Start Nexus",anchor=Tkinter.W,background="#C8C8C8",variable=nexusvar)
-StartNexus.place(x=680,y=200,width=220,height=35)
+StartNexus.place(x=880,y=200,width=220,height=35)
 StartNexus.select()#default make this option selected
 
 StopatEnd = Tkinter.Checkbutton(rot,text="Stop Treadmill @ END",anchor=Tkinter.W,background="#C8C8C8",variable=stopatendvar)
-StopatEnd.place(x=680,y=240,width=220,height=35)
+StopatEnd.place(x=880,y=240,width=220,height=35)
 StopatEnd.select()
 
 #drop down menu for different control function

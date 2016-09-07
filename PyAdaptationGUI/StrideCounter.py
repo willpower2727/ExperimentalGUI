@@ -39,6 +39,7 @@ def ControlLoop(STDARGS):
     CARGS["inclineang"] = STDARGS["inclineang"]
     CARGS["prevvelL"] = prevvelL
     CARGS["prevvelR"] = prevvelR
+    CARGS["keypressed"] = 0
 
     if isinstance(STDARGS["velL"],( int, long )):#check to make sure user loaded a profile
         print('Error: no speed profile has been loaded.')
@@ -128,8 +129,9 @@ def ControlLoop(STDARGS):
 
         CARGS["prevvelL"] = out[0]
         CARGS["prevvelR"] = out[1]
+        CARGS["keypressed"] = out[2]
 
-	savestring = [data["FN"],Rz,Lz,int(RHS),int(LHS),int(RTO),int(LTO),int(STDARGS["pauseevent"].is_set())]
+	savestring = [data["FN"],Rz,Lz,int(RHS),int(LHS),int(RTO),int(LTO),int(STDARGS["pauseevent"].is_set()),CARGS["keypressed"]]
 	STDARGS["q2"].put(savestring)
 
     if (STDARGS["nexusvar"]==1):

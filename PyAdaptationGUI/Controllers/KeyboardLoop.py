@@ -1,9 +1,12 @@
+import numpy
+
 def ControlLoop(CARGS):
-##    print(CARGS)
-##    print 'size of q5: ',CARGS["q5"].qsize()
 
     if (CARGS["q5"].empty()==False):
-        print 'Keypress in controller: ',CARGS["q5"].get()
+        keyp = CARGS["q5"].get()
+        print 'Keypress: ',keyp
+    else:
+        keyp = 0
     
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]
@@ -22,7 +25,7 @@ def ControlLoop(CARGS):
         prevvelR = CARGS["velR"][CARGS["rstrides"]]
         prevvelL = CARGS["velL"][CARGS["lstrides"]]
 
-    return [prevvelL,prevvelR]
+    return [prevvelL,prevvelR,keyp]
 
     
 
