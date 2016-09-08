@@ -1,12 +1,10 @@
-import numpy
-
 def ControlLoop(CARGS):
 
     if (CARGS["q5"].empty()==False):
         keyp = CARGS["q5"].get()
         print 'Keypress: ',keyp
     else:
-        keyp = 0
+        keyp = 0 #ascii code for null character
     
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]
@@ -19,11 +17,22 @@ def ControlLoop(CARGS):
             CARGS["q3"].put(speedlist)
         prevvelR = 0
         prevvelL = 0
-    elif (prevvelR != CARGS["velR"][CARGS["rstrides"]]) | (prevvelL != CARGS["velL"][CARGS["lstrides"]]):#only send a new command if it is different from the old one
-        speedlist = [int(1000*CARGS["velR"][CARGS["rstrides"]]),int(1000*CARGS["velL"][CARGS["lstrides"]]),1000,1000,CARGS["inclineang"]]
-        CARGS["q3"].put(speedlist)
-        prevvelR = CARGS["velR"][CARGS["rstrides"]]
-        prevvelL = CARGS["velL"][CARGS["lstrides"]]
+    elif (CARGS["isnan"](CARGS["velR"][CARGS["rstrides"]])) or (CARGS["isnan"](CARGS["velL"][CARGS["lstrides"]])): #alter speeds based on key press, note this is regardless of which leg has nan in profile
+        if (keyp == 9999): #Next button 
+            speedlist = [int(1000*(prevvelR+CARGS["sign"](1-prevvelR)*0.1)),int(1000*(prevvelL+CARGS["sign"](1-prevvelL)*0.1)),1000,1000,CARGS["inclineang"]]
+            CARGS["q3"].put(speedlist)
+            prevvelR = prevvelR+CARGS["sign"](1-prevvelR)*0.1
+            prevvelL = prevvelL+CARGS["sign"](1-prevvelL)*0.1
+        elif (keyp == 7777): #Prior button
+            speedlist = [int(1000*(prevvelR-CARGS["sign"](1-prevvelR)*0.1)),int(1000*(prevvelL-CARGS["sign"](1-prevvelL)*0.1)),1000,1000,CARGS["inclineang"]]
+            CARGS["q3"].put(speedlist)
+            prevvelR = prevvelR-CARGS["sign"](1-prevvelR)*0.1
+            prevvelL = prevvelL-CARGS["sign"](1-prevvelL)*0.1
+    elif (prevvelR != CARGS["velR"][CARGS["rstrides"]]) or (prevvelL != CARGS["velL"][CARGS["lstrides"]]):#only send a new command if it is different from the old one or a key was pressed
+            speedlist = [int(1000*CARGS["velR"][CARGS["rstrides"]]),int(1000*CARGS["velL"][CARGS["lstrides"]]),1000,1000,CARGS["inclineang"]]
+            CARGS["q3"].put(speedlist)
+            prevvelR = CARGS["velR"][CARGS["rstrides"]]
+            prevvelL = CARGS["velL"][CARGS["lstrides"]]
 
     return [prevvelL,prevvelR,keyp]
 

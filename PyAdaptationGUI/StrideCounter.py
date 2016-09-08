@@ -8,6 +8,7 @@ from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 import tkMessageBox
 import imp
+import numpy
 
 def ControlLoop(STDARGS):
 
@@ -39,7 +40,11 @@ def ControlLoop(STDARGS):
     CARGS["inclineang"] = STDARGS["inclineang"]
     CARGS["prevvelL"] = prevvelL
     CARGS["prevvelR"] = prevvelR
-    CARGS["keypressed"] = 0
+    CARGS["keypressed"] = 0 #ascii null character, initial value
+    CARGS["axe"] = STDARGS["axe"]#pass in the axis and canvas in case the controller wants to plot something unique
+    CARGS["canvas"] = STDARGS["canvas"]
+    CARGS["sign"] = numpy.sign#pass along some numpy functions
+    CARGS["isnan"] = numpy.isnan
 
     if isinstance(STDARGS["velL"],( int, long )):#check to make sure user loaded a profile
         print('Error: no speed profile has been loaded.')
@@ -96,7 +101,10 @@ def ControlLoop(STDARGS):
                 STDARGS["Rspdind"].delete(1.0,Tkinter.END)
                 STDARGS["Rspdind"].insert(Tkinter.END,str(rstrides))
                 STDARGS["Rspdind"].configure(state='disabled')#don't let anyone type in this
-                STDARGS["axe"].plot(rstrides,STDARGS["velR"][rstrides],'r',marker='o',fillstyle='full')
+                if numpy.isnan(STDARGS["velR"][rstrides]):
+                    STDARGS["axe"].plot(rstrides,CARGS["prevvelR"],'r',marker='o',fillstyle='full')
+                else:
+                    STDARGS["axe"].plot(rstrides,STDARGS["velR"][rstrides],'r',marker='o',fillstyle='full') #nans are plotted but invisible, like matlab
                 STDARGS["canvas"].draw()
                 if LTO:
                     gaitphase = 2
@@ -108,7 +116,10 @@ def ControlLoop(STDARGS):
                 STDARGS["Lspdind"].delete(1.0,Tkinter.END)
                 STDARGS["Lspdind"].insert(Tkinter.END,str(lstrides))
                 STDARGS["Lspdind"].configure(state='disabled')#don't let anyone type in this
-                STDARGS["axe"].plot(lstrides,STDARGS["velL"][lstrides],'b',marker='o',fillstyle='full')
+                if numpy.isnan(STDARGS["velL"][lstrides]):
+                    STDARGS["axe"].plot(lstrides,CARGS["prevvelL"],'b',marker='o',fillstyle='full')
+                else:
+                    STDARGS["axe"].plot(lstrides,STDARGS["velL"][lstrides],'b',marker='o',fillstyle='full')
                 STDARGS["canvas"].draw()
                 if RTO:
                     gaitphase = 1
