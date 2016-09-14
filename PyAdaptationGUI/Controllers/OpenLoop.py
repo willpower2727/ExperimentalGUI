@@ -22,7 +22,7 @@ def ControlLoop(CARGS):
             prevvelR = CARGS["velR"][CARGS["rstrides"]]
             prevvelL = CARGS["velL"][CARGS["lstrides"]]
 
-    return [prevvelL,prevvelR,0]
+    return [prevvelL,prevvelR]
 
 	
 

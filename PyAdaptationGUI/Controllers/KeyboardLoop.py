@@ -1,11 +1,6 @@
 def ControlLoop(CARGS):
 
-    if (CARGS["q5"].empty()==False):
-        keyp = CARGS["q5"].get()
-        print 'Keypress: ',keyp
-    else:
-        keyp = 0 #ascii code for null character
-    
+    keyp = CARGS["keypressed"]
     prevvelR = CARGS["prevvelR"]
     prevvelL = CARGS["prevvelL"]
     #determine if speeds need to be sent
@@ -34,7 +29,7 @@ def ControlLoop(CARGS):
             prevvelR = CARGS["velR"][CARGS["rstrides"]]
             prevvelL = CARGS["velL"][CARGS["lstrides"]]
 
-    return [prevvelL,prevvelR,keyp]
+    return [prevvelL,prevvelR]
 
     
 

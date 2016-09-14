@@ -77,8 +77,8 @@ def startup(): #what to do when the gui is created
 
 def ClosebyX(): #what to do when closing the gui
 ##	print('Window closed')
-	rot.quit()
 	rot.destroy()
+	rot.quit()
 	sys.exit
 
 def Execute():  #what to do when execute is pressed
@@ -112,7 +112,11 @@ def Execute():  #what to do when execute is pressed
 	#ask the treadmill for the current incline angle, this will be written on every command during the trial so as not to change it (that would be really bad if the treadmill was locked)
 	inca = BertecComm.askforangle()#asks the treadmill 1 time what the current incline angle is
 	inca = int(round(inca,-1))#format the read, and round it to nearest 10
-	print('Incline Angle: ',inca)
+	Incind.configure(state='normal')
+	Incind.delete(1.0,Tkinter.END)
+	Incind.insert(Tkinter.END,str(inca))
+	Incind.configure(state='disabled')
+##	print('Incline Angle: ',inca)
 
 	#build standard input argument dictionary, this can/will be passed into whatever control algorithm is selected. It's up to the creator of each control algorithm to determine whether to use all the information or not
 	STDARGS = {}#create the dictionary
@@ -121,21 +125,26 @@ def Execute():  #what to do when execute is pressed
 	STDARGS["speedlist"] = speedlist
 	STDARGS["q3"] = q3
 	STDARGS["savestring"] = savestring
-	STDARGS["q2"] = q2
+	STDARGS["q2"] = q2 
 	STDARGS["q5"] = q5
-	STDARGS["velL"] = velL
+	STDARGS["velL"] = velL#belt speed profiles
 	STDARGS["velR"] = velR
 	STDARGS["inclineang"] = inca #this will/should change in the future
 	STDARGS["nexusvar"] = nexusvar.get()
-	STDARGS["stopevent"] = stopevent
-	STDARGS["axe"] = axe
-	STDARGS["canvas"] = canvas
-	STDARGS["stopatendvar"] = stopatendvar
-	STDARGS["Rspdind"] = Rspdind
-	STDARGS["Lspdind"] = Lspdind
-	STDARGS["StatusText"] = StatusText
-	STDARGS["startbut"] = startbut
-	STDARGS["pauseevent"] = pauseevent
+	STDARGS["stopevent"] = stopevent #threading event raised on stop callback
+	STDARGS["axe"] = axe #plot axis
+	STDARGS["canvas"] = canvas #plot canvas
+	STDARGS["stopatendvar"] = stopatendvar #flag to stop at end of max stride count 
+	STDARGS["Rspdind"] = Rspdind #right stride count indicator
+	STDARGS["Lspdind"] = Lspdind #left stride count
+	STDARGS["Rbspdind"] = Rbspdind #right belt speed indicator
+	STDARGS["Lbspdind"] = Lbspdind #left belt speed
+	STDARGS["Incind"] = Incind #incline angle indicator
+	STDARGS["Freqind"] = Freqind #GUI main loop sampling frequency indicator
+	STDARGS["Misind"] = Misind #missing stride count indicator
+	STDARGS["StatusText"] = StatusText #GUI status indicator
+	STDARGS["startbut"] = startbut #Execute button
+	STDARGS["pauseevent"] = pauseevent #threading event raised on pause callback
 	STDARGS["controller"] = 'C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\Controllers\\' + funlist.get()
 ##	print(STDARGS["controller"])
 	
@@ -143,7 +152,7 @@ def Execute():  #what to do when execute is pressed
 	t1 = threading.Thread(target=NexusClient.NexusClient,args=(root,q1,stopevent))#communicates with Nexus
 	t2 = threading.Thread(target=StrideCounter.ControlLoop,args=(STDARGS,))#the brain thread, counts strides and updates belt speeds
 	t3 = threading.Thread(target=SaveThread.save,args=(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inca,funlist.get()[:-3]))#takes care of saving data to file
-	t4 = threading.Thread(target=BertecComm.sendreceive,args=(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inca))#communicates with the treadmill
+	t4 = threading.Thread(target=BertecComm.sendreceive,args=(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inca,Rbspdind,Lbspdind))#communicates with the treadmill
 	t5 = threading.Thread(target=KeyHook.Hook,args=(q5,stopevent))
 		
 	t1.daemon = True
@@ -248,36 +257,93 @@ pausebut.configure(state='disabled')
 plotbutton = Tkinter.Button(rot,text='PLOT',command = plot,bg='#A7ECE3',font=("Helvetica",15))
 plotbutton.place(x=375,y=650,width=100,height=50)
 
-Rspdlabel = Tkinter.Text(rot,background='#C8C8C8')
-Rspdlabel.place(x=1030,y=65,width=70,height=25)
+SClabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+SClabel.place(x=880,y=45,width=220,height=25)
+SClabel.insert(Tkinter.END,'Stride Count')
+
+BSlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+BSlabel.place(x=880,y=155,width=220,height=25)
+BSlabel.insert(Tkinter.END,'Belt Speeds (m/s)')
+
+Rspdlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Rspdlabel.place(x=1000,y=75,width=70,height=25)
 Rspdlabel.insert(Tkinter.END,'Right')
 Rspdlabel.configure(state='disabled')
-Lspdlabel = Tkinter.Text(rot,background='#C8C8C8')
-Lspdlabel.place(x=940,y=65,width=70,height=25)
+Lspdlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Lspdlabel.place(x=900,y=75,width=70,height=25)
 Lspdlabel.insert(Tkinter.END,'Left')
 Lspdlabel.configure(state='disabled')
 
 Rspdind = Tkinter.Text(rot,background='#FF3C3C',font=("Helvetica",20))
-Rspdind.place(x=1030,y=100,width=70,height=35)
-Rspdind.insert(Tkinter.END,'000')
+Rspdind.place(x=1000,y=105,width=100,height=35)
+Rspdind.insert(Tkinter.END,'00000')
 Rspdind.configure(state='disabled')#don't let anyone type in this
 
 Lspdind = Tkinter.Text(rot,background='#4FBDE5',font=("Helvetica",20))
-Lspdind.place(x=940,y=100,width=70,height=35)
-Lspdind.insert(Tkinter.END,'000')
+Lspdind.place(x=880,y=105,width=100,height=35)
+Lspdind.insert(Tkinter.END,'00000')
 Lspdind.configure(state='disabled')
 
+Rbspdlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Rbspdlabel.place(x=1000,y=190,width=70,height=25)
+Rbspdlabel.insert(Tkinter.END,'Right')
+Rbspdlabel.configure(state='disabled')
+Lbspdlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Lbspdlabel.place(x=900,y=190,width=70,height=25)
+Lbspdlabel.insert(Tkinter.END,'Left')
+Lbspdlabel.configure(state='disabled')
+
+Rbspdind = Tkinter.Text(rot,background='#FF3C3C',font=("Helvetica",20))
+Rbspdind.place(x=1000,y=220,width=100,height=35)
+Rbspdind.insert(Tkinter.END,'000.00')
+Rbspdind.configure(state='disabled')#don't let anyone type in this
+
+Lbspdind = Tkinter.Text(rot,background='#4FBDE5',font=("Helvetica",20))
+Lbspdind.place(x=880,y=220,width=100,height=35)
+Lbspdind.insert(Tkinter.END,'000.00')
+Lbspdind.configure(state='disabled')
+
+Inclabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Inclabel.place(x=880,y=340,width=220,height=25)
+Inclabel.insert(Tkinter.END,'Incline Angle')
+Inclabel.configure(state='disabled')
+
+Incind = Tkinter.Text(rot,background='#C8C8C8')
+Incind.place(x=880,y=370,width=220,height=25)
+Incind.insert(Tkinter.END,'0')
+Incind.configure(state='disabled')
+
+Freqlabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Freqlabel.place(x=880,y=410,width=220,height=25)
+Freqlabel.insert(Tkinter.END,'Sampling Frequency (Hz)')
+Freqlabel.configure(state='disabled')
+
+Freqind = Tkinter.Text(rot,background='#C8C8C8')
+Freqind.place(x=880,y=440,width=220,height=25)
+Freqind.insert(Tkinter.END,'0')
+Freqind.configure(state='disabled')
+
+Mislabel = Tkinter.Text(rot,background='#C8C8C8',font=("Helvetica",12,"bold"))
+Mislabel.place(x=880,y=470,width=220,height=25)
+Mislabel.insert(Tkinter.END,'Missed Frame Count')
+Mislabel.configure(state='disabled')
+
+Misind = Tkinter.Text(rot,background='#C8C8C8')
+Misind.place(x=880,y=500,width=220,height=25)
+Misind.insert(Tkinter.END,'0')
+Misind.configure(state='disabled')
+
 StatusText = Tkinter.Text(rot,background='#6E67FF',font=("Helvetica",25))
-StatusText.place(x=880,y=150,width=220,height=40)
+StatusText.place(x=880,y=290,width=220,height=40)
 StatusText.insert(Tkinter.END,'Idle')
 StatusText.configure(state='disabled')
 
 StartNexus = Tkinter.Checkbutton(rot,text="Start Nexus",anchor=Tkinter.W,background="#C8C8C8",variable=nexusvar)
-StartNexus.place(x=880,y=200,width=220,height=35)
+StartNexus.place(x=880,y=550,width=220,height=35)
 StartNexus.select()#default make this option selected
 
 StopatEnd = Tkinter.Checkbutton(rot,text="Stop Treadmill @ END",anchor=Tkinter.W,background="#C8C8C8",variable=stopatendvar)
-StopatEnd.place(x=880,y=240,width=220,height=35)
+StopatEnd.place(x=880,y=590,width=220,height=35)
 StopatEnd.select()
 
 #drop down menu for different control function

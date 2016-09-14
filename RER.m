@@ -7,8 +7,10 @@ function [] = RER(OGspeed)
 velL = 0.25*OGspeed*ones(180,1);
 x = 1:180;
 y = 0.25*OGspeed+(OGspeed-0.25*OGspeed)/180*x;
+velL_2 = OGspeed*ones(180,1);
 
-velL = [velL;y'];
+
+velL = [velL;y';velL_2];
 velR = velL;
 
 % velL = [velL;OGspeed*ones(180,1)];

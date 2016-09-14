@@ -17,6 +17,11 @@ def ControlLoop(STDARGS):
     
     sport = serial.Serial()
     sport.port = "COM1"
+    Miscount = 0#counter variable for frames missed
+    interframetimes = [float(0)] * 200 #empty array of last 100 inter frame durations, will be used to compute live sampling rate
+    curtime = time.clock()
+    lasttime = time.clock()
+    oldFN = 0
     rstrides = 0
     lstrides = 0
     new_stanceR = False
@@ -28,9 +33,15 @@ def ControlLoop(STDARGS):
     prevvelL = STDARGS["velL"][0]
     prevvelR = STDARGS["velR"][0]
     maxstridecount = len(STDARGS["velL"])
+
+    STDARGS["Misind"].configure(state='normal') #reset missing frame counter
+    STDARGS["Misind"].delete(1.0,Tkinter.END)
+    STDARGS["Misind"].insert(Tkinter.END,str(0))
+    STDARGS["Misind"].configure(state='disabled')
+
+    
     CARGS = {}#create dictionary of arguments to be passed to the controller
     CARGS["q3"] = STDARGS["q3"]
-    CARGS["q5"] = STDARGS["q5"]
     CARGS["speedlist"] = STDARGS["speedlist"]
     CARGS["maxstridecount"] = maxstridecount
     CARGS["stopevent"] = STDARGS["stopevent"]
@@ -45,6 +56,7 @@ def ControlLoop(STDARGS):
     CARGS["canvas"] = STDARGS["canvas"]
     CARGS["sign"] = numpy.sign#pass along some numpy functions
     CARGS["isnan"] = numpy.isnan
+    CARGS["mean"] = numpy.mean
 
     if isinstance(STDARGS["velL"],( int, long )):#check to make sure user loaded a profile
         print('Error: no speed profile has been loaded.')
@@ -72,9 +84,33 @@ def ControlLoop(STDARGS):
     while (not STDARGS["stopevent"].is_set()):
         
 	root = STDARGS["q1"].get()
+	
+        curtime = time.clock()#how much time has passed since last iteration?
+        interframetimes.append(curtime-lasttime)
+        interframetimes.pop(0)
+##        print interframetimes
+        lasttime = curtime
+
+        if (interframetimes[0] != 0): #only update about every 2 seconds
+##            print interframetimes
+            STDARGS["Freqind"].configure(state='normal')
+            STDARGS["Freqind"].delete(1.0,Tkinter.END)
+            STDARGS["Freqind"].insert(Tkinter.END,str(round(1/numpy.mean(interframetimes),2)))
+            STDARGS["Freqind"].configure(state='disabled')
+            interframetimes = [float(0)] * 200 
+	
 	data = ParseRoot.ParseRoot(root)
+	FN = data["FN"]
 	Rz = float(data["Rz"])
 	Lz = float(data["Lz"])
+
+	if (FN-oldFN>1):
+            Miscount += FN-oldFN
+            STDARGS["Misind"].configure(state='normal')
+            STDARGS["Misind"].delete(1.0,Tkinter.END)
+            STDARGS["Misind"].insert(Tkinter.END,str(Miscount))
+            STDARGS["Misind"].configure(state='disabled')
+        oldFN = FN
 
 	old_stanceR = new_stanceR
 	old_stanceL = new_stanceL
@@ -133,6 +169,14 @@ def ControlLoop(STDARGS):
                 gaitphase = 1
                 rstrides += 1
 
+        if (STDARGS["q5"].empty()==False):
+            keyp = STDARGS["q5"].get()
+            CARGS["keypressed"] = keyp
+            print 'Keypress: ',keyp
+        else:
+            keyp = 0 #ascii code for null character
+            CARGS["keypressed"] = keyp
+
         CARGS["rstrides"] = rstrides
         CARGS["lstrides"] = lstrides
 
@@ -140,7 +184,7 @@ def ControlLoop(STDARGS):
 
         CARGS["prevvelL"] = out[0]
         CARGS["prevvelR"] = out[1]
-        CARGS["keypressed"] = out[2]
+##        CARGS["keypressed"] = out[2]
 
 	savestring = [data["FN"],Rz,Lz,int(RHS),int(LHS),int(RTO),int(LTO),int(STDARGS["pauseevent"].is_set()),CARGS["keypressed"]]
 	STDARGS["q2"].put(savestring)
@@ -158,7 +202,39 @@ def ControlLoop(STDARGS):
 ##    StartNexus.configure(state='normal')
     STDARGS["startbut"].configure(state='normal')
 
+
 	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

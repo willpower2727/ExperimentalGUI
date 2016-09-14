@@ -1,6 +1,7 @@
 import socket
 import io
 import struct
+import Tkinter
 
 def askforangle():
     ##  HOST2 = 'BIOE-PC'
@@ -43,7 +44,7 @@ def parsepacket(inpack):
     except:
         return ['nan','nan','nan','nan','nan','nan']
 
-def sendreceive(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inclineang):
+def sendreceive(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inclineang,Rbspdind,Lbspdind):
 ##  HOST2 = 'BIOE-PC'
     HOST2 = 'localhost'
     PORT2 = 4000
@@ -71,6 +72,14 @@ def sendreceive(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inclineang):
                     inpack = s2.recv(32)#read from the treadmill
 ##                    print('inpack on send lengthL ',len(inpack))
                     reads = parsepacket(inpack)
+                    Rbspdind.configure(state='normal')
+                    Rbspdind.delete(1.0,Tkinter.END)
+                    Rbspdind.insert(Tkinter.END,str(round(reads[1],2)/1000))
+                    Rbspdind.configure(state='disabled')
+                    Lbspdind.configure(state='normal')
+                    Lbspdind.delete(1.0,Tkinter.END)
+                    Lbspdind.insert(Tkinter.END,str(round(reads[2],2)/1000))
+                    Lbspdind.configure(state='disabled')
                     savepack = [speedlist[0],speedlist[1],reads[1],reads[2],reads[5]]
                     q4.put(savepack)
             else:
@@ -86,6 +95,14 @@ def sendreceive(speedlist,q3,treadsave,q4,stopevent,stopatendvar,inclineang):
                     inpack = s2.recv(32)#read from the treadmill
 ##                    print('inpack on empty lengthL ',len(inpack))
                     reads = parsepacket(inpack)
+                    Rbspdind.configure(state='normal')
+                    Rbspdind.delete(1.0,Tkinter.END)
+                    Rbspdind.insert(Tkinter.END,str(round(reads[1],2)/1000))
+                    Rbspdind.configure(state='disabled')
+                    Lbspdind.configure(state='normal')
+                    Lbspdind.delete(1.0,Tkinter.END)
+                    Lbspdind.insert(Tkinter.END,str(round(reads[2],2)/1000))
+                    Lbspdind.configure(state='disabled')
                     savepack = ['nan','nan',reads[1],reads[2],reads[5]]
                     q4.put(savepack)
                     

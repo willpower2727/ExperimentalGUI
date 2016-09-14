@@ -292,6 +292,7 @@ if get(handles.Nexus_checkbox,'Value')==1
 %      %use orange wire out of serial port to pin 64 on AD board
       s = serial('COM1');
       fopen(s);
+      pause(0.1);
       fclose(s);%this set of commands pulses the voltage high then low, signaling start/stop capture in nexus
       
       if get(handles.waitForNexusChkBox,'Value')==1
@@ -473,6 +474,7 @@ if startedNexus_flag
 %       step(myudp,int8(stopmsg));
 
     fopen(s);
+    pause(0.1);
     fclose(s);
 end
 

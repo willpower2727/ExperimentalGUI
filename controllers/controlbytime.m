@@ -297,14 +297,14 @@ while ~STOP %only runs if stop button is not pressed
             sendTreadmillPacket(payload,t);
         end
         
-%     elseif etime(clock,starttime) >= 360 && etime(clock,starttime) <= 540
-%         elaptime = etime(clock,starttime);
-%         if lflag || rflag
-%             payload = getPayload(velL(end),velL(end),1000,1000,cur_incl);
-%             sendTreadmillPacket(payload,t);
-%         end
+    elseif etime(clock,starttime) >= 360 && etime(clock,starttime) <= 540
+        elaptime = etime(clock,starttime);
+        if lflag || rflag
+            payload = getPayload(velL(end),velL(end),1000,1000,cur_incl);
+            sendTreadmillPacket(payload,t);
+        end
        
-    elseif etime(clock,starttime) > 360
+    elseif etime(clock,starttime) > 540
         STOP = 1;
     end
 
