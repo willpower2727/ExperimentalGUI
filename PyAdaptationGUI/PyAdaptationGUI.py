@@ -51,11 +51,11 @@ axe = f.add_subplot(111)
 global canvas
 canvas = FigureCanvasTkAgg(f, master=rot)
 
-global nexusvar#variable flag that indicates whether or not to start Nexus on startup
-nexusvar = Tkinter.IntVar()
+##global nexusvar#variable flag that indicates whether or not to start Nexus on startup
+nexusvar = Tkinter.IntVar(rot)
 
-global stopatendvar #whether or not to stop the treadmill at the end of a profile, default is yes stop
-stopatendvar = Tkinter.IntVar()
+##global stopatendvar #whether or not to stop the treadmill at the end of a profile, default is yes stop
+stopatendvar = Tkinter.IntVar(rot)
 
 #initialize profiles
 global velL #belt speed profiles to be loaded from a file later
@@ -77,14 +77,15 @@ def startup(): #what to do when the gui is created
 
 def ClosebyX(): #what to do when closing the gui
 ##	print('Window closed')
-	rot.destroy()
+##	rot.destroy()
 	rot.quit()
-	sys.exit
+##	rot.destroy()
+##	sys.exit
 
 def Execute():  #what to do when execute is pressed
 	global stopevent
 	global pauseevent
-	global nexusvar
+##	global nexusvar
 	global profilename
 	stopevent.clear()#remove any prior event flags
 	pauseevent.clear()
@@ -347,7 +348,7 @@ StopatEnd.place(x=880,y=590,width=220,height=35)
 StopatEnd.select()
 
 #drop down menu for different control function
-global funlist
+##global funlist
 funlist = Tkinter.StringVar(rot)
 
 drplabel = Tkinter.Text(rot,background='#C8C8C8')
@@ -368,3 +369,4 @@ dropdown.place(x=500,y=675,width=160,height=25)
 
 rot.protocol('WM_DELETE_WINDOW', ClosebyX)
 rot.mainloop()#this actually starts the GUI
+rot.destroy()

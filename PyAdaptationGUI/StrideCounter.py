@@ -1,7 +1,7 @@
 import ParseRoot
 import serial
 import time
-import Tkinter
+import mtTkinter as Tkinter
 import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.figure import Figure
