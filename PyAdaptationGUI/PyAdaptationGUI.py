@@ -52,10 +52,10 @@ global canvas
 canvas = FigureCanvasTkAgg(f, master=rot)
 
 ##global nexusvar#variable flag that indicates whether or not to start Nexus on startup
-nexusvar = Tkinter.IntVar(rot)
+nexusvar = Tkinter.IntVar(master=rot)
 
 ##global stopatendvar #whether or not to stop the treadmill at the end of a profile, default is yes stop
-stopatendvar = Tkinter.IntVar(rot)
+stopatendvar = Tkinter.IntVar(master=rot)
 
 #initialize profiles
 global velL #belt speed profiles to be loaded from a file later
@@ -76,11 +76,8 @@ def startup(): #what to do when the gui is created
 	canvas.get_tk_widget().place(x=0,y=50,width=875,height=575)
 
 def ClosebyX(): #what to do when closing the gui
-##	print('Window closed')
-##	rot.destroy()
+##	print('PyAdaptationGUI closed')
 	rot.quit()
-##	rot.destroy()
-##	sys.exit
 
 def Execute():  #what to do when execute is pressed
 	global stopevent
@@ -370,3 +367,4 @@ dropdown.place(x=500,y=675,width=160,height=25)
 rot.protocol('WM_DELETE_WINDOW', ClosebyX)
 rot.mainloop()#this actually starts the GUI
 rot.destroy()
+##print('Main Window Destroyed')

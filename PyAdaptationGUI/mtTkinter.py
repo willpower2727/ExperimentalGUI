@@ -1,28 +1,37 @@
-'''Thread-safe version of tkinter.
-Copyright (c) 2014, Andrew Barnert
-Based on mtTkinter (for Python 2.x), copyright (c) 2009, Allen B. Taylor
+'''Thread-safe version of Tkinter.
+
+Copyright (c) 2009, Allen B. Taylor
+
 This module is free software: you can redistribute it and/or modify
 it under the terms of the GNU Lesser Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
+
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Lesser Public License for more details.
+
 You should have received a copy of the GNU Lesser Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 Usage:
-    import mttkinter as tkinter
-    # Use "t." as usual.
+
+    import mtTkinter as Tkinter
+    # Use "Tkinter." as usual.
+
 or
-    from mtt import *
-    # Use tkinter module definitions as usual.
-This module modifies the original tkinter module in memory, making all
+
+    from mtTkinter import *
+    # Use Tkinter module definitions as usual.
+
+This module modifies the original Tkinter module in memory, making all
 functionality thread-safe. It does this by wrapping the Tk class' tk
 instance with an object that diverts calls through an event queue when
 the call is issued from a thread other than the thread in which the Tk
 instance was created. The events are processed in the creation thread
 via an 'after' event.
+
 The modified Tk class accepts two additional keyword parameters on its
 __init__ method:
     mtDebug:
@@ -35,10 +44,12 @@ __init__ method:
         out-of-thread events when things are otherwise idle. Decreasing
         this value can improve GUI responsiveness, but at the expense of
         consuming more CPU cycles.
-Note that, because it modifies the original tkinter module (in memory),
-other modules that use tkinter (e.g., Pmw) reap the benefits automagically
-as long as mttkinter is imported at some point before extra threads are
+
+Note that, because it modifies the original Tkinter module (in memory),
+other modules that use Tkinter (e.g., Pmw) reap the benefits automagically
+as long as mtTkinter is imported at some point before extra threads are
 created.
+
 Author: Allen B. Taylor, a.b.taylor@gmail.com
 '''
 
@@ -87,21 +98,22 @@ class _TkAttr(object):
         """
 
         # Check if we're in the creation thread.
-        if threading.currentThread() == self._tk._creationThread:
+##        if threading.currentThread() == self._tk._creationThread:
+            #######################################################################################changed by WDA 9/20/2016
+        if (threading.currentThread() == self._tk._creationThread) or isinstance(threading.currentThread(), threading._DummyThread):
             # We're in the creation thread; just call the event directly.
             if self._tk._debug >= 8 or \
                self._tk._debug >= 3 and self._attr.__name__ == 'call' and \
                len(args) >= 1 and args[0] == 'after':
-                print('Calling event directly: {} {} {}'.format(
-                      self._attr.__name__, args, kwargs))
+                print 'Calling event directly:', \
+                    self._attr.__name__, args, kwargs
             return self._attr(*args, **kwargs)
         else:
             # We're in a different thread than the creation thread; enqueue
             # the event, and then wait for the response.
             responseQueue = Queue.Queue(1)
             if self._tk._debug >= 1:
-                print('Marshalling event: {} {} {}'.format(
-                      self._attr.__name__, args, kwargs))
+                print 'Marshalling event:', self._attr.__name__, args, kwargs
             self._tk._eventQueue.put((self._attr, args, kwargs, responseQueue))
             isException, response = responseQueue.get()
 
@@ -109,7 +121,7 @@ class _TkAttr(object):
             # an exception.
             if isException:
                 exType, exValue, exTb = response
-                raise exType(exValue).with_traceback(exTb)
+                raise exType, exValue, exTb
             else:
                 return response
 
@@ -125,7 +137,7 @@ def _Tk__init__(self, *args, **kwargs):
             del kwargs[name]
 
     # Call the original __init__ method, creating the internal tk member.
-    self.__original__init__mttkinter(*args, **kwargs)
+    self.__original__init__mtTkinter(*args, **kwargs)
 
     # Replace the internal tk member with a wrapper that handles calls from
     # other threads.
@@ -135,7 +147,7 @@ def _Tk__init__(self, *args, **kwargs):
     self.after_idle(_CheckEvents, self)
 
 # Replace Tk's original __init__ with the hook.
-Tk.__original__init__mttkinter = Tk.__init__
+Tk.__original__init__mtTkinter = Tk.__init__
 Tk.__init__ = _Tk__init__
 
 def _CheckEvents(tk):
@@ -150,8 +162,6 @@ def _CheckEvents(tk):
                 method, args, kwargs, responseQueue = \
                     tk.tk._eventQueue.get_nowait()
             except:
-                if tk.tk._debug >= 2:
-                    print('Event queue empty')
                 # No more events to process.
                 break
             else:
@@ -159,13 +169,13 @@ def _CheckEvents(tk):
                 # the result back to the caller via the response queue.
                 used = True
                 if tk.tk._debug >= 2:
-                    print('Calling event from main thread: {} {} {}'
-                          .format(method.__name__, args, kwargs))
+                    print 'Calling event from main thread:', \
+                        method.__name__, args, kwargs
                 try:
                     responseQueue.put((False, method(*args, **kwargs)))
-                except SystemExit as ex:
-                    raise
-                except Exception as ex:
+                except SystemExit, ex:
+                    raise SystemExit, ex
+                except Exception, ex:
                     # Calling the event caused an exception; return the
                     # exception back to the caller so that it can be raised
                     # in the caller's thread.
@@ -185,7 +195,8 @@ def _testThread(root):
     text = "This is Tcl/Tk version %s" % TclVersion
     if TclVersion >= 8.1:
         try:
-            text = text + "\nThis should be a cedilla: \347"
+            text = text + unicode("\nThis should be a cedilla: \347",
+                                  "iso-8859-1")
         except NameError:
             pass # no unicode support
     try:
@@ -195,7 +206,7 @@ def _testThread(root):
             raise RuntimeError
     except:
         text = text + "\nTcl is NOT built with thread support"
-    text = text + "\nmttkinter works with or without Tcl thread support"
+    text = text + "\nmtTkinter works with or without Tcl thread support"
     label = Label(root, text=text)
     label.pack()
     button = Button(root, text="Click me!",
@@ -222,7 +233,7 @@ def _pressOk(root, button):
     except:
         pass # Likely we're exiting
 
-# Test. Mostly borrowed from the tkinter module, but the important bits moved
+# Test. Mostly borrowed from the Tkinter module, but the important bits moved
 # into a separate thread.
 if __name__ == '__main__':
     import threading
@@ -230,3 +241,4 @@ if __name__ == '__main__':
     thread = threading.Thread(target = _testThread, args=(root,))
     thread.start()
     root.mainloop()
+    thread.join()
