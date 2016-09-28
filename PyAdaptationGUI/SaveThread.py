@@ -2,6 +2,7 @@ import csv
 import time
 import numpy
 import ntpath
+import os
 
 def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang,controllername):
 
@@ -39,3 +40,7 @@ def save(savestring,q2,treadsave,q4,velL,velR,profilename,stopevent,inclineang,c
 		    csvw.writerow(savestr)
 		fileout.close() 
 		print('Saving complete.')
+		print('converting to Datlog...')
+		os.system('C:\Users\BioE\Documents\MATLAB\ExperimentalGUI\PyAdaptationGUI\DataFiles\Py2Datlog_automatic.exe ' + filename)
+		print('Data file was successfully converted to datlog')
+                          
