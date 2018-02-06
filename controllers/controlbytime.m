@@ -29,7 +29,6 @@ if isrow(velL) && isrow(velR)
 else
     ylim([min([velL/1000;velR/1000])-1,max([velL/1000;velR/1000])+1]);
 end
-
 xlabel('Time (s)');
 ylabel('Speed (m/s)');
 legend('Left Foot','Right Foot');
@@ -134,7 +133,7 @@ RstepCount=0;
 datlog.inclineang = cur_incl;
 
 if cur_incl ~= 0
-    warndlg('WARNING!!! WARNING!!! Treadmill incline is detected as non zero, this function was not meant to be used for decline walking!! Please stop and consult the code before continuing.','STOP!','modal');
+    warndlg('WARNING!!! WARNING!!! Treadmill incline is detected as non zero, this function was not meant to be used for incline/decline walking!! Please stop and consult the code before continuing.','STOP!','modal');
 end
 
 %Send first speed command

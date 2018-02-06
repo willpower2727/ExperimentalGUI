@@ -147,12 +147,12 @@ while STOP == 0 %only runs if stop button is not pressed
         if (Fz_R.Result.Value ~= 2) || (Fz_L.Result.Value ~= 2)
             STOP = 1;  %stop, the GUI can't find the right forceplate values
             disp('ERROR! Adaptation GUI unable to read forceplate data, check device names and function');
-            datlog.errormsgs{end+1} = 'Adaptation GUI unable to read forceplate data, check device names and function';
+%             datlog.errormsgs{end+1} = 'Adaptation GUI unable to read forceplate data, check device names and function';
         end
     end
-    HANDRAIL_X = MyClient.GetDeviceOutputValue( 'Handrail', 'Fx');
-    HANDRAIL_Y = MyClient.GetDeviceOutputValue( 'Handrail', 'Fy');
-    HANDRAIL_Z = MyClient.GetDeviceOutputValue( 'Handrail', 'Fz');
+%     HANDRAIL_X = MyClient.GetDeviceOutputValue( 'Handrail', 'Fx');
+%     HANDRAIL_Y = MyClient.GetDeviceOutputValue( 'Handrail', 'Fy');
+%     HANDRAIL_Z = MyClient.GetDeviceOutputValue( 'Handrail', 'Fz');
     
     SubjectName = MyClient.GetSubjectName(1).SubjectName;
     LPSIS = MyClient.GetMarkerGlobalTranslation( SubjectName, 'PC1' );

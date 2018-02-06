@@ -147,8 +147,10 @@ while ~STOP %only runs if stop button is not pressed
     SubjectName = MyClient.GetSubjectName(1).SubjectName;
     LANK = MyClient.GetMarkerGlobalTranslation( SubjectName, 'LANK' );
     RANK = MyClient.GetMarkerGlobalTranslation( SubjectName, 'RANK' );
-    LHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'LHIP' );
-    RHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'RHIP' );
+%     LHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'LHIP' );
+%     RHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'RHIP' );
+    LHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'LGT' );
+    RHIP = MyClient.GetMarkerGlobalTranslation( SubjectName, 'RGT' );
     LANK = LANK.Translation;
     RANK = RANK.Translation;
     LHIP = LHIP.Translation;

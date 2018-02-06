@@ -311,23 +311,25 @@ if get(handles.Nexus_checkbox,'Value')==1
     delete(ll);
     
     %Give some time between Nexus start and treadmill start
-    pause(.2)
+    pause(.1)
 
 end
 
 %switch between the available functions to call
+    aux=regexp(profilename,'\');
+    shortName=profilename(aux(end)+1:end-4);
 switch(selection)
-    
+
     case 1%control speed with steps
         
-        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_edit1(round(velL*1000), round(velR*1000), forceThreshold, profilename(1:end-4)); %
+        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_edit1(round(velL*1000), round(velR*1000), forceThreshold, shortName); %
 %         [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_edit1_old(round(velL*1000), round(velR*1000), forceThreshold);
 %         keyboard;
 
     case 2
         mode=1; %Signed
         allowedKeys={'numpad4','numpad6','leftarrow','rightarrow','pagedown','pageup'};
-        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, profilename(1:end-4),mode); %
+        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, shortName,mode); %
     case 3
         mode=0; %Unsigned 
         allowedKeys={'numpad8','numpad2','uparrow','downarrow'};
@@ -336,7 +338,7 @@ switch(selection)
             %disp('bad')
         end
         %signList
-        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, profilename(1:end-4),mode,signList); %
+        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, shortName,mode,signList); %
         
     case 4
         mode=4; %Closed-loop control
@@ -346,7 +348,7 @@ switch(selection)
         if ~exist('paramComputeFunc','var') || ~exist('paramCalibFunc','var') || ~isa(paramComputeFunc,'function_handle') || ~isa(paramCalibFunc,'function_handle')
             error('paramComputeFunc or paramCalibFunc are not defined.')
         end
-        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, profilename(1:end-4),mode,[],paramComputeFunc,paramCalibFunc); %
+        [RTOTime, LTOTime, RHSTime, LHSTime, commSendTime, commSendFrame] = controlSpeedWithSteps_selfSelect(round(velL*1000), round(velR*1000), forceThreshold, shortName,mode,[],paramComputeFunc,paramCalibFunc); %
         
     case 5%self selected speed
         disp('running self selected speed');
@@ -384,7 +386,7 @@ switch(selection)
 %         disp('the stdev gamma for the L leg is:');
 %         disp(Lstdbeta);
 %         keyboard
-        SL_BF_findtargets(round(velL*1000),round(velR*1000),forceThreshold,profilename);
+        SL_BF_findtargets(round(velL*1000),round(velR*1000),forceThreshold,shortName);
         %         save('Rgammarecord',Rgammarecord);%save it just in case
         %         save('Lgammarecord',Lgammarecord);
     case 9
@@ -450,7 +452,8 @@ switch(selection)
         SL_BF_findtargets_OG(round(velL*1000),round(velR*1000),forceThreshold,profilename);
         
     case 12
-        controlbytime(velL*1000,velR*1000,forceThreshold,profilename);
+%         controlbytime(velL*1000,velR*1000,forceThreshold,profilename);
+        controlbytime2(velL*1000,velR*1000,forceThreshold,profilename);
 end
                
 pause(3); %Wait three seconds before stopping software collection
