@@ -44,7 +44,7 @@ datlog.speedprofile.velL = velL;
 datlog.speedprofile.velR = velR;
 datlog.TreadmillCommands.header = {'RBS','LBS','angle','U Time','Relative Time'};
 datlog.TreadmillCommands.read = nan(300*length(velR)+7200,4);
-datlog.TreadmillCommands.sent = nan(300*length(velR)+7200,4);%nan(length(velR)+50,4);
+datlog.TreadmillCommands.sent = nan(20*length(velR)+100,4);%nan(length(velR)+50,4);
 
 %do initial save
 try
@@ -496,9 +496,9 @@ for z = 1:temp-1
     datlog.TreadmillCommands.read(z,4) = etime(datevec(datlog.TreadmillCommands.read(z,4)),datevec(datlog.framenumbers.data(1,2))); %This fails when no frames were received
 end
 
-%temp = find(isnan(datlog.TreadmillCommands.sent(:,4)),1,'first');
-% datlog.TreadmillCommands.sent(temp:end,:) = [];
- for z = 1:temp-1
+temp = find(isnan(datlog.TreadmillCommands.sent(end:-1:1,4)),1,'last');
+datlog.TreadmillCommands.sent=datlog.TreadmillCommands.sent(1:end-temp,:);
+ for z = 1:size(datlog.TreadmillCommands.sent,1)
      datlog.TreadmillCommands.sent(z,4) = etime(datevec(datlog.TreadmillCommands.sent(z,4)),datevec(datlog.framenumbers.data(1,2)));
  end
 
