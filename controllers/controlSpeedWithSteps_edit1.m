@@ -401,15 +401,29 @@ try %stopping the treadmill
         set(ghandle.Status_textbox,'String','Stopping...');
         set(ghandle.Status_textbox,'BackgroundColor','red');
         set(ghandle.figure1,'Color',[1,1,1]);
-        pause(1)%provide a little time to collect the last steps and so forth
+        pause(.5) %Do we need this? what for? -- Pablo 26/2/2018
         smoothStop(t);
     %see if the treadmill should be stopped when the STOP button is pressed
     elseif get(ghandle.StoptreadmillSTOP_checkbox,'Value')==1 && STOP == 1
-
         set(ghandle.Status_textbox,'String','Stopping');
         set(ghandle.Status_textbox,'BackgroundColor','red');
-        pause(1)
+        pause(.3)
         smoothStop(t);
+    end
+    %Check if treadmill stopped, if not, try again:
+    [cur_speedR,cur_speedL,cur_incl] = readTreadmillPacket(t);
+    stopped = cur_speedR==0 && cur_speedL==0;
+    counter=0;
+    while ~stopped && counter<5 %Try 5 times to stop the treadmill smoothly
+        disp('Treadmill did not stop when requested. Trying again.')
+        smoothStop(t)
+        pause(.3)
+        [cur_speedR,cur_speedL,cur_incl] = readTreadmillPacket(t);
+        stopped = cur_speedR==0 && cur_speedL==0;
+        counter=counter+1;
+    end
+    if counter>=5
+        disp('Could not stop treadmill after 5 attempts')
     end
     
 catch ME
