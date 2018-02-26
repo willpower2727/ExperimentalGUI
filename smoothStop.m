@@ -7,21 +7,22 @@ function smoothStop(t)
     [vn,in]=min(abs(v));
     %Set decceleration rates proportional to current speed (so both belts
     %stop at the same time)
-    aR=abs(cur_speedR)*700/vM;
-    aL=abs(cur_speedL)*700/vM;
+    %aR=abs(cur_speedR)*700/vM; %Stopping at 700 mm/s^2 for f
+    %aL=abs(cur_speedL)*700/vM;
     %First: get the fast belt to go at the speed of the slow one:
-    [payload] = getPayload(v(in),v(in),aR,aL,cur_incl);
+    a=2*(vM-vn); %Take half a second to match the speeds
+    [payload] = getPayload(v(in),v(in),a,a,cur_incl); %Set both belts equal to the slowest
     sendTreadmillPacket(payload,t);
-    expectedStopTime=(vM-vn)/700;
-    %expectedStopTime=(v(iM)-v(in))/500;
-    pause(expectedStopTime+.4)
-%     pause(2)
-    %Then ask for a full stop:
-    [payload] = getPayload(0,0,700,700,cur_incl);
+    %expectedSlowdownTime=(vM-vn)/700; %Expected time until both belts
+    %match each other, if decelerating at 700mm/s^2
+    expectedSlowdownTime=.5;
+    pause(expectedSlowdownTime+.2)%Wait 
+    %Then ask for a full stop, in another 500ms:
+    a=2*vn;
+    [payload] = getPayload(0,0,a,a,cur_incl);
     disp('created stop')
     sendTreadmillPacket(payload,t)
     disp('sent stop')
-    clear aR aL
 
     %WHAT WE WERE DOING BEFORE: (uncomment to revert)
     %[payload] = getPayload(0,0,500,500,0);
