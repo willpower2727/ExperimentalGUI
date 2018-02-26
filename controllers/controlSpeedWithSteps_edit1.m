@@ -303,7 +303,7 @@ while ~STOP %only runs if stop button is not pressed
 %                 LTOTime(LstepCount) = TimeStamp;
                 LTOTime(LstepCount) = now;
                 datlog.stepdata.LTOdata(LstepCount-1,:) = [LstepCount-1,now,framenum.Value];
-                set(ghandle.LBeltSpeed_textbox,'String',num2str(velL(LstepCount)/1000));
+                %set(ghandle.LBeltSpeed_textbox,'String',num2str(velL(LstepCount)/1000));
             end
         case 4 %DS, coming from single R
             if RTO
@@ -312,7 +312,7 @@ while ~STOP %only runs if stop button is not pressed
 %                 RTOTime(RstepCount) = TimeStamp;
                 RTOTime(RstepCount) = now;
                 datlog.stepdata.RTOdata(RstepCount-1,:) = [RstepCount-1,now,framenum.Value];
-                set(ghandle.RBeltSpeed_textbox,'String',num2str(velR(RstepCount)/1000));
+                %set(ghandle.RBeltSpeed_textbox,'String',num2str(velR(RstepCount)/1000));
             end
     end
     
@@ -320,16 +320,20 @@ while ~STOP %only runs if stop button is not pressed
         break
     %only send a command if it is different from the previous one. Don't
     %overload the treadmill controller with commands
-    elseif (velR(RstepCount) ~= old_velR.Value) || (velL(LstepCount) ~= old_velL.Value) && LstepCount<N && RstepCount<N
+    elseif (velR(RstepCount) ~= old_velR.Value) || (velL(LstepCount) ~= old_velL.Value)% && LstepCount<N && RstepCount<N
         payload = getPayload(velR(RstepCount),velL(LstepCount),acc,acc,cur_incl);
         sendTreadmillPacket(payload,t);
-        datlog.TreadmillCommands.sent(frameind.Value,:) = [velR(RstepCount),velL(LstepCount),cur_incl,now];%record the command
+        datlog.TreadmillCommands.sent(frameind.Value,:) = [velR(RstepCount),velL(LstepCount),cur_incl,now]; %record the command
         disp(['Packet sent, Lspeed = ' num2str(velL(LstepCount)) ', Rspeed = ' num2str(velR(RstepCount))])
-%         set(ghandle.RBeltSpeed_textbox,'String',num2str(velR(RstepCount)/1000));
-%         set(ghandle.LBeltSpeed_textbox,'String',num2str(velL(LstepCount)/1000));
+        if (velR(RstepCount) ~= old_velR.Value)
+         set(ghandle.RBeltSpeed_textbox,'String',num2str(velR(RstepCount)/1000));
+        else %(velL(LstepCount) ~= old_velL.Value)
+         set(ghandle.LBeltSpeed_textbox,'String',num2str(velL(LstepCount)/1000));
+        end
     else
         %simply record what the treadmill should be doing
-        datlog.TreadmillCommands.sent(frameind.Value,:) = [velR(RstepCount),velL(LstepCount),cur_incl,now];%record the command
+        %datlog.TreadmillCommands.sent(frameind.Value,:) = [velR(RstepCount),velL(LstepCount),cur_incl,now];%record the command
+        %Pablo commented out on 26/2/2018 because it is unnecessary and takes time to save later.
     end
     
     old_velR.Value = velR(RstepCount);
